@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCare Pro - Pharmacy & Medical Store Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Mobile Header Bar -->
+  <header class="mobile-topbar">
+    <div class="brand-logo-small">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v20M2 12h20"/>
+      </svg>
+    </div>
+    <span class="mobile-topbar-title">MediCare Store</span>
+    <span class="status-badge-online">Online</span>
+  </header>
+
+  <div class="app-shell">
+    <!-- Desktop Sidebar -->
+    <aside>
+      <div class="brand-container">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M2 12h20"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>MediCare Pro</h1>
+          <span class="brand-sub">Pharmacy System</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-button active" data-section="dashboard">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-button" data-section="books">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+          <span>Medicines Inventory</span>
+        </button>
+        <button class="nav-button" data-section="members">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Patients & Customers</span>
+        </button>
+        <button class="nav-button" data-section="issues">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3"/><path d="M8 8.5l4-4 4 4"/><path d="M12 13.7l-4 4"/><path d="M12 13.7l4 4"/></svg>
+          <span>Dispense & Returns</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="dot-indicator"></span>
+          <span>Store Database Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <!-- Top Navigation & Header Bar -->
+      <div class="top-header-bar">
+        <div class="header-welcome">
+          <h2>Medical Store Management Console</h2>
+          <p>Real-time pharmaceutical inventory, prescription dispensing, and patient registry.</p>
+        </div>
+        <div class="header-actions">
+          <div class="live-clock-chip">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span id="currentDateChip">Rx Store System</span>
+          </div>
+        </div>
+      </div>
+
+      <p id="message" role="alert"></p>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="section active">
+        <div class="section-title-wrap">
+          <div>
+            <h3>Store Performance Overview</h3>
+            <p class="subtitle">Summary statistics of inventory stock, patient registry, and active prescriptions.</p>
+          </div>
+        </div>
+
+        <div class="cards">
+          <article class="metric-card metric-emerald">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+            </div>
+            <div class="metric-info">
+              <span>Total Medicines</span>
+              <strong id="totalBooks">0</strong>
+              <small class="metric-label">Items in Stock</small>
+            </div>
+          </article>
+
+          <article class="metric-card metric-cyan">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="metric-info">
+              <span>Registered Patients</span>
+              <strong id="totalMembers">0</strong>
+              <small class="metric-label">Active Customers</small>
+            </div>
+          </article>
+
+          <article class="metric-card metric-blue">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3"/><path d="M12 13.7l4 4"/></svg>
+            </div>
+            <div class="metric-info">
+              <span>Medicines Dispensed</span>
+              <strong id="totalIssued">0</strong>
+              <small class="metric-label">Active Orders</small>
+            </div>
+          </article>
+
+          <article class="metric-card metric-rose">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </div>
+            <div class="metric-info">
+              <span>Overdue Refills</span>
+              <strong id="totalOverdue">0</strong>
+              <small class="metric-label">Pending Returns</small>
+            </div>
+          </article>
+        </div>
+
+        <div class="quick-shortcuts">
+          <h4>Quick Operations</h4>
+          <div class="shortcut-grid">
+            <button class="shortcut-card" onclick="document.querySelector('[data-section=\'issues\']').click()">
+              <div class="shortcut-icon icon-teal">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <div class="shortcut-text">
+                <strong>Dispense Medicine</strong>
+                <span>Issue prescription to patient</span>
+              </div>
+            </button>
+            <button class="shortcut-card" onclick="document.querySelector('[data-section=\'books\']').click(); setTimeout(() => showBookForm(), 100)">
+              <div class="shortcut-icon icon-cyan">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/></svg>
+              </div>
+              <div class="shortcut-text">
+                <strong>Add New Stock</strong>
+                <span>Register new medicine product</span>
+              </div>
+            </button>
+            <button class="shortcut-card" onclick="document.querySelector('[data-section=\'members\']').click(); setTimeout(() => showMemberForm(), 100)">
+              <div class="shortcut-icon icon-blue">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <div class="shortcut-text">
+                <strong>Register Patient</strong>
+                <span>Add patient profile & contacts</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Medicines Inventory Section -->
+      <section id="books" class="section">
+        <div class="section-heading">
+          <div>
+            <h3>Medicines & Inventory Stock</h3>
+            <p class="subtitle">Search, add, edit, or adjust pharmaceutical products in store stock.</p>
+          </div>
+          <button id="addBookButton" onclick="showBookForm()" class="btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            <span> Add Medicine</span>
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="bookSearch" placeholder="Search medicine by title or manufacturer..." oninput="loadBooks()">
+          </div>
+        </div>
+
+        <div id="bookForm" class="form-box hidden"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Medicine Name</th>
+                <th>Manufacturer / Brand</th>
+                <th>Barcode / Batch Code</th>
+                <th>Category</th>
+                <th>Stock Level</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="booksList"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Patients & Customers Section -->
+      <section id="members" class="section">
+        <div class="section-heading">
+          <div>
+            <h3>Patient & Customer Directory</h3>
+            <p class="subtitle">Manage registered customers, contact numbers, and prescription histories.</p>
+          </div>
+          <button onclick="showMemberForm()" class="btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            <span> Register Patient</span>
+          </button>
+        </div>
+
+        <div id="memberForm" class="form-box hidden"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient Name</th>
+                <th>Email Address</th>
+                <th>Phone Number</th>
+                <th>Registration Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="membersList"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Prescription Dispense & Returns Section -->
+      <section id="issues" class="section">
+        <div class="section-heading">
+          <div>
+            <h3>Prescription Dispense & Returns</h3>
+            <p class="subtitle">Issue prescription medicines to patients and record batch stock returns.</p>
+          </div>
+        </div>
+
+        <div class="dispense-grid">
+          <div id="issueFormBox" class="form-box dispense-card">
+            <div class="form-card-title">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+              <h4>Dispense Prescription Medicine</h4>
+            </div>
+            <form id="issueForm">
+              <label>
+                Select Medicine Product
+                <select id="issueBook" required></select>
+              </label>
+              <label>
+                Select Patient / Customer
+                <select id="issueMember" required></select>
+              </label>
+              <button class="btn-primary btn-full">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3"/><path d="M12 13.7l4 4"/></svg>
+                <span>Dispense Medicine</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="active-dispense-wrap">
+            <h4>Active Dispensed Medicines & Refills</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Medicine</th>
+                    <th>Dispensed Date</th>
+                    <th>Refill Due</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="issuesList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Mobile Bottom Tab Navigation Bar -->
+  <nav class="mobile-navbar" aria-label="Primary">
+    <button class="nav-button active" data-section="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-button" data-section="books">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+      <span>Medicines</span>
+    </button>
+    <button class="nav-button" data-section="members">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Patients</span>
+    </button>
+    <button class="nav-button" data-section="issues">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3"/><path d="M12 13.7l4 4"/></svg>
+      <span>Dispense</span>
+    </button>
+  </nav>
+
+  <script src="script.js"></script>
+</body>
+</html>
