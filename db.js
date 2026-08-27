@@ -55,22 +55,7 @@ const sampleMembers = [
   ['Meera Nair', 'meera.patient@example.com', '9876543213', '2026-04-22']
 ];
 
-async function migrateLegacySchema() {
-  const legacyTable = await db.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'books'");
-  if (!legacyTable.rows[0]) return;
-
-  await db.execute('ALTER TABLE books RENAME TO medicines');
-  await db.execute('ALTER TABLE medicines RENAME COLUMN title TO name');
-  await db.execute('ALTER TABLE medicines RENAME COLUMN author TO manufacturer');
-  await db.execute('ALTER TABLE medicines RENAME COLUMN isbn TO barcode');
-  await db.execute('ALTER TABLE medicines RENAME COLUMN genre TO category');
-  await db.execute('ALTER TABLE medicines RENAME COLUMN total_copies TO total_units');
-  await db.execute('ALTER TABLE medicines RENAME COLUMN available_copies TO available_units');
-  await db.execute('ALTER TABLE issues RENAME COLUMN book_id TO medicine_id');
-}
-
 const ready = (async () => {
-  await migrateLegacySchema();
   await db.batch([
     ...schema.map((sql) => ({ sql, args: [] })),
     ...sampleMedicines.map((args) => ({
