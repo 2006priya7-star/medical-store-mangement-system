@@ -17,27 +17,18 @@ app.use('/api/medicines', medicinesRouter);
 app.use('/api/patients', patientsRouter);
 app.use('/api/dispense', dispenseRouter);
 
-// Fallback legacy routes for compatibility
-app.use('/api/books', medicinesRouter);
-app.use('/api/members', patientsRouter);
-app.use('/api/issues', dispenseRouter);
-
 // Gets the summary numbers displayed on the dashboard cards.
 app.get('/api/dashboard', async (req, res, next) => {
   try {
     await ready;
     const today = new Date().toISOString().split('T')[0];
     const [medicines, patients, dispensed, overdue] = await db.batch([
-      'SELECT COALESCE(SUM(total_copies), 0) AS total FROM books',
+      'SELECT COALESCE(SUM(total_units), 0) AS total FROM medicines',
       'SELECT COUNT(*) AS total FROM members',
       'SELECT COUNT(*) AS total FROM issues WHERE return_date IS NULL',
       { sql: 'SELECT COUNT(*) AS total FROM issues WHERE return_date IS NULL AND due_date < ?', args: [today] }
     ]);
     res.json({
-      totalBooks: medicines.rows[0].total,
-      totalMembers: patients.rows[0].total,
-      totalIssued: dispensed.rows[0].total,
-      totalOverdue: overdue.rows[0].total,
       totalMedicines: medicines.rows[0].total,
       totalPatients: patients.rows[0].total,
       totalDispensed: dispensed.rows[0].total,

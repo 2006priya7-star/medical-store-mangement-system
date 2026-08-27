@@ -441,7 +441,7 @@ button:active {
   pointer-events: none;
 }
 
-#bookSearch {
+#medicineSearch {
   width: 100%;
   padding: 11px 14px 11px 42px;
   border: 1px solid var(--border);
@@ -453,7 +453,7 @@ button:active {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-#bookSearch:focus {
+#medicineSearch:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);

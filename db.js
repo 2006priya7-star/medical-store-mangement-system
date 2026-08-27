@@ -10,14 +10,14 @@ const db = createClient({
 });
 
 const schema = [
-  `CREATE TABLE IF NOT EXISTS books (
+  `CREATE TABLE IF NOT EXISTS medicines (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    author TEXT NOT NULL,
-    isbn TEXT NOT NULL UNIQUE,
-    genre TEXT NOT NULL,
-    total_copies INTEGER NOT NULL,
-    available_copies INTEGER NOT NULL
+    name TEXT NOT NULL,
+    manufacturer TEXT NOT NULL,
+    barcode TEXT NOT NULL UNIQUE,
+    category TEXT NOT NULL,
+    total_units INTEGER NOT NULL,
+    available_units INTEGER NOT NULL
   )`,
   `CREATE TABLE IF NOT EXISTS members (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,18 +28,18 @@ const schema = [
   )`,
   `CREATE TABLE IF NOT EXISTS issues (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    book_id INTEGER NOT NULL,
+    medicine_id INTEGER NOT NULL,
     member_id INTEGER NOT NULL,
     issue_date TEXT NOT NULL,
     due_date TEXT NOT NULL,
     return_date TEXT,
     fine REAL DEFAULT 0,
-    FOREIGN KEY (book_id) REFERENCES books(id),
+    FOREIGN KEY (medicine_id) REFERENCES medicines(id),
     FOREIGN KEY (member_id) REFERENCES members(id)
   )`
 ];
 
-const sampleBooks = [
+const sampleMedicines = [
   ['Paracetamol 500mg', 'GlaxoSmithKline', '8901234567890', 'Analgesic', 50, 50],
   ['Amoxicillin 250mg', 'Pfizer India', '8909876543210', 'Antibiotic', 40, 40],
   ['Ibuprofen 400mg', 'Abbott Laboratories', '8901122334455', 'Anti-inflammatory', 60, 60],
@@ -55,16 +55,33 @@ const sampleMembers = [
   ['Meera Nair', 'meera.patient@example.com', '9876543213', '2026-04-22']
 ];
 
-const ready = db.batch([
-  ...schema.map((sql) => ({ sql, args: [] })),
-  ...sampleBooks.map((args) => ({
-    sql: 'INSERT OR IGNORE INTO books (title, author, isbn, genre, total_copies, available_copies) VALUES (?, ?, ?, ?, ?, ?)',
+async function migrateLegacySchema() {
+  const legacyTable = await db.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'books'");
+  if (!legacyTable.rows[0]) return;
+
+  await db.execute('ALTER TABLE books RENAME TO medicines');
+  await db.execute('ALTER TABLE medicines RENAME COLUMN title TO name');
+  await db.execute('ALTER TABLE medicines RENAME COLUMN author TO manufacturer');
+  await db.execute('ALTER TABLE medicines RENAME COLUMN isbn TO barcode');
+  await db.execute('ALTER TABLE medicines RENAME COLUMN genre TO category');
+  await db.execute('ALTER TABLE medicines RENAME COLUMN total_copies TO total_units');
+  await db.execute('ALTER TABLE medicines RENAME COLUMN available_copies TO available_units');
+  await db.execute('ALTER TABLE issues RENAME COLUMN book_id TO medicine_id');
+}
+
+const ready = (async () => {
+  await migrateLegacySchema();
+  await db.batch([
+    ...schema.map((sql) => ({ sql, args: [] })),
+    ...sampleMedicines.map((args) => ({
+    sql: 'INSERT OR IGNORE INTO medicines (name, manufacturer, barcode, category, total_units, available_units) VALUES (?, ?, ?, ?, ?, ?)',
     args
   })),
   ...sampleMembers.map((args) => ({
     sql: 'INSERT OR IGNORE INTO members (name, email, phone, membership_date) VALUES (?, ?, ?, ?)',
     args
   }))
-], 'write');
+  ], 'write');
+})();
 
 module.exports = { db, ready };

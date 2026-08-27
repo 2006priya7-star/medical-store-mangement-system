@@ -12,7 +12,7 @@
 
 ## What YOU still need to do
 
-### 1. routes/books.js, routes/members.js, routes/issues.js — done
+### 1. routes/medicines.js, routes/patients.js, routes/dispense.js — done
 These are now converted and included in this bundle: every handler is
 `async`, uses `const { db } = require('../db')`, and calls
 `db.execute({ sql, args })` (returning `.rows` / `.rowsAffected` /
@@ -24,9 +24,9 @@ batch is the equivalent atomic multi-statement call.
 ### 2. Create a Turso database
     npm install -g @tursodb/cli   # or see turso.tech for the installer
     turso auth login
-    turso db create library-app
-    turso db show library-app --url          # -> TURSO_DATABASE_URL
-    turso db tokens create library-app        # -> TURSO_AUTH_TOKEN
+    turso db create medical-store-app
+    turso db show medical-store-app --url     # -> TURSO_DATABASE_URL
+    turso db tokens create medical-store-app  # -> TURSO_AUTH_TOKEN
 
 ### 3. Set environment variables in Netlify
 Site settings -> Environment variables -> add TURSO_DATABASE_URL and

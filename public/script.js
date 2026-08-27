@@ -25,85 +25,85 @@ function escapeHtml(value) {
 async function loadDashboard() {
   try {
     const data = await request(`${api}/dashboard`);
-    document.getElementById('totalBooks').textContent = data.totalMedicines || data.totalBooks;
-    document.getElementById('totalMembers').textContent = data.totalPatients || data.totalMembers;
-    document.getElementById('totalIssued').textContent = data.totalDispensed || data.totalIssued;
-    document.getElementById('totalOverdue').textContent = data.totalOverdueRefills || data.totalOverdue;
+    document.getElementById('totalMedicines').textContent = data.totalMedicines;
+    document.getElementById('totalMembers').textContent = data.totalPatients;
+    document.getElementById('totalIssued').textContent = data.totalDispensed;
+    document.getElementById('totalOverdue').textContent = data.totalOverdueRefills;
   } catch (error) { showMessage(error.message, true); }
 }
 
 // Loads medicines and displays them in the inventory table.
-async function loadBooks() {
+async function loadMedicines() {
   try {
-    const search = document.getElementById('bookSearch').value;
-    const books = await request(`${api}/medicines?search=${encodeURIComponent(search)}`);
-    window.books = books;
-    const actions = (book) => `
-      <button class="small" onclick="showBookForm(${book.id})">Edit</button>
-      <button class="small danger" onclick="deleteBook(${book.id})">Delete</button>
+    const search = document.getElementById('medicineSearch').value;
+    const medicines = await request(`${api}/medicines?search=${encodeURIComponent(search)}`);
+    window.medicines = medicines;
+    const actions = (medicine) => `
+      <button class="small" onclick="showMedicineForm(${medicine.id})">Edit</button>
+      <button class="small danger" onclick="deleteMedicine(${medicine.id})">Delete</button>
     `;
-    document.getElementById('booksList').innerHTML = books.map((book) => `
+    document.getElementById('medicinesList').innerHTML = medicines.map((medicine) => `
       <tr>
-        <td data-label="Medicine Name"><strong>${escapeHtml(book.title)}</strong></td>
-        <td data-label="Manufacturer / Brand">${escapeHtml(book.author)}</td>
-        <td data-label="Barcode / Batch Code"><code>${escapeHtml(book.isbn)}</code></td>
-        <td data-label="Category"><span class="badge-category">${escapeHtml(book.genre)}</span></td>
-        <td data-label="Stock Level"><span class="badge-stock ${book.available_copies === 0 ? 'low-stock' : ''}">${book.available_copies} / ${book.total_copies} units</span></td>
-        <td data-label="Actions" class="actions-cell">${actions(book)}</td>
+        <td data-label="Medicine Name"><strong>${escapeHtml(medicine.name)}</strong></td>
+        <td data-label="Manufacturer / Brand">${escapeHtml(medicine.manufacturer)}</td>
+        <td data-label="Barcode / Batch Code"><code>${escapeHtml(medicine.barcode)}</code></td>
+        <td data-label="Category"><span class="badge-category">${escapeHtml(medicine.category)}</span></td>
+        <td data-label="Stock Level"><span class="badge-stock ${medicine.available_units === 0 ? 'low-stock' : ''}">${medicine.available_units} / ${medicine.total_units} units</span></td>
+        <td data-label="Actions" class="actions-cell">${actions(medicine)}</td>
       </tr>
     `).join('') || '<tr><td colspan="6" style="text-align:center; padding: 24px; color: var(--muted);">No medicine products found in inventory.</td></tr>';
   } catch (error) { showMessage(error.message, true); }
 }
 
 // Shows the add or edit medicine form.
-function showBookForm(id) {
-  const book = id ? window.books.find((item) => item.id === id) : { title: '', author: '', isbn: '', genre: 'General', total_copies: 10 };
-  document.getElementById('bookForm').classList.remove('hidden');
-  document.getElementById('bookForm').innerHTML = `
+function showMedicineForm(id) {
+  const medicine = id ? window.medicines.find((item) => item.id === id) : { name: '', manufacturer: '', barcode: '', category: 'General', total_units: 10 };
+  document.getElementById('medicineForm').classList.remove('hidden');
+  document.getElementById('medicineForm').innerHTML = `
     <h3>${id ? 'Edit' : 'Add New'} Medicine Product</h3>
-    <form onsubmit="saveBook(event, ${id || 'null'})">
+    <form onsubmit="saveMedicine(event, ${id || 'null'})">
       <label>Medicine Name
-        <input name="title" required placeholder="e.g. Paracetamol 500mg" value="${escapeHtml(book.title)}">
+        <input name="name" required placeholder="e.g. Paracetamol 500mg" value="${escapeHtml(medicine.name)}">
       </label>
       <label>Manufacturer / Brand
-        <input name="author" required placeholder="e.g. GlaxoSmithKline" value="${escapeHtml(book.author)}">
+        <input name="manufacturer" required placeholder="e.g. GlaxoSmithKline" value="${escapeHtml(medicine.manufacturer)}">
       </label>
       <label>Barcode / Batch Code (10-17 digits)
-        <input name="isbn" pattern="[0-9-]{10,17}" required placeholder="e.g. 8901234567890" value="${escapeHtml(book.isbn)}">
+        <input name="barcode" pattern="[0-9-]{10,17}" required placeholder="e.g. 8901234567890" value="${escapeHtml(medicine.barcode)}">
       </label>
       <label>Drug Category
-        <input name="genre" required placeholder="e.g. Analgesic, Antibiotic" value="${escapeHtml(book.genre)}">
+        <input name="category" required placeholder="e.g. Analgesic, Antibiotic" value="${escapeHtml(medicine.category)}">
       </label>
       <label>Total Units in Stock
-        <input name="total_copies" type="number" min="0" required value="${book.total_copies}">
+        <input name="total_units" type="number" min="0" required value="${medicine.total_units}">
       </label>
       <div style="width: 100%; display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
         <button class="btn-primary">Save Medicine Product</button>
-        <button type="button" class="secondary" onclick="hideForm('bookForm')">Cancel</button>
+        <button type="button" class="secondary" onclick="hideForm('medicineForm')">Cancel</button>
       </div>
     </form>
   `;
 }
 
 // Adds a new medicine or saves edits to an existing medicine.
-async function saveBook(event, id) {
+async function saveMedicine(event, id) {
   event.preventDefault();
   const data = Object.fromEntries(new FormData(event.target));
   try {
     await request(`${api}/medicines${id ? `/${id}` : ''}`, { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    hideForm('bookForm');
+    hideForm('medicineForm');
     showMessage(`Medicine product ${id ? 'updated' : 'added'} successfully.`);
-    loadBooks(); loadDashboard(); loadIssueChoices();
+    loadMedicines(); loadDashboard(); loadIssueChoices();
   } catch (error) { showMessage(error.message, true); }
 }
 
 // Deletes one medicine after asking for confirmation.
-async function deleteBook(id) {
+async function deleteMedicine(id) {
   if (!confirm('Delete this medicine product from store inventory?')) return;
   try {
     await request(`${api}/medicines/${id}`, { method: 'DELETE' });
     showMessage('Medicine product deleted.');
-    loadBooks(); loadDashboard(); loadIssueChoices();
+    loadMedicines(); loadDashboard(); loadIssueChoices();
   } catch (error) { showMessage(error.message, true); }
 }
 
@@ -180,11 +180,11 @@ async function deleteMember(id) {
 async function loadIssues() {
   try {
     const issues = await request(`${api}/dispense`);
-    const returnButton = (issue) => `<button class="small" onclick="returnBook(${issue.id})">Return Stock / Refill</button>`;
+    const returnButton = (issue) => `<button class="small" onclick="returnMedicine(${issue.id})">Return Stock / Refill</button>`;
     document.getElementById('issuesList').innerHTML = issues.map((issue) => `
       <tr>
         <td data-label="Patient"><strong>${escapeHtml(issue.member_name)}</strong></td>
-        <td data-label="Medicine">${escapeHtml(issue.book_title)}</td>
+        <td data-label="Medicine">${escapeHtml(issue.medicine_name)}</td>
         <td data-label="Dispensed Date">${issue.issue_date}</td>
         <td data-label="Refill Due">${issue.due_date}</td>
         <td data-label="Status"><span class="status ${issue.status === 'Overdue' ? 'overdue' : ''}">${issue.status === 'Overdue' ? 'Refill Overdue' : 'On Schedule'}</span></td>
@@ -197,17 +197,17 @@ async function loadIssues() {
 // Fills the dispense form with available medicines and all patients.
 async function loadIssueChoices() {
   try {
-    const [books, members] = await Promise.all([request(`${api}/medicines`), request(`${api}/patients`)]);
-    document.getElementById('issueBook').innerHTML = '<option value="">Select a medicine product</option>' + books.filter((book) => book.available_copies > 0).map((book) => `<option value="${book.id}">${escapeHtml(book.title)} (${book.available_copies} units available)</option>`).join('');
+    const [medicines, members] = await Promise.all([request(`${api}/medicines`), request(`${api}/patients`)]);
+    document.getElementById('issueMedicine').innerHTML = '<option value="">Select a medicine product</option>' + medicines.filter((medicine) => medicine.available_units > 0).map((medicine) => `<option value="${medicine.id}">${escapeHtml(medicine.name)} (${medicine.available_units} units available)</option>`).join('');
     document.getElementById('issueMember').innerHTML = '<option value="">Select a registered patient</option>' + members.map((member) => `<option value="${member.id}">${escapeHtml(member.name)} (${member.phone})</option>`).join('');
   } catch (error) { showMessage(error.message, true); }
 }
 
 // Dispenses selected medicine to selected patient.
-async function issueBook(event) {
+async function dispenseMedicine(event) {
   event.preventDefault();
   try {
-    await request(`${api}/dispense`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ book_id: document.getElementById('issueBook').value, member_id: document.getElementById('issueMember').value }) });
+    await request(`${api}/dispense`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ medicine_id: document.getElementById('issueMedicine').value, member_id: document.getElementById('issueMember').value }) });
     showMessage('Medicine dispensed successfully. Refill/return due in 14 days.');
     event.target.reset();
     refreshAll();
@@ -215,7 +215,7 @@ async function issueBook(event) {
 }
 
 // Returns a dispensed medicine stock and displays any calculated late surcharge.
-async function returnBook(id) {
+async function returnMedicine(id) {
   try {
     const result = await request(`${api}/dispense/${id}/return`, { method: 'POST' });
     showMessage(result.fine ? `Stock returned to inventory. Late Surcharge: ₹${result.fine} for ${result.late_days} overdue day(s).` : 'Stock returned to inventory. No late surcharge.');
@@ -227,7 +227,7 @@ async function returnBook(id) {
 function hideForm(id) { document.getElementById(id).classList.add('hidden'); }
 
 // Refreshes every section after a medicine dispense or return.
-function refreshAll() { loadDashboard(); loadBooks(); loadMembers(); loadIssues(); loadIssueChoices(); }
+function refreshAll() { loadDashboard(); loadMedicines(); loadMembers(); loadIssues(); loadIssueChoices(); }
 
 // Switches visible sections when a navigation button is clicked.
 function setupNavigation() {
@@ -246,7 +246,7 @@ function startApp() {
     const now = new Date();
     dateChip.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
-  document.getElementById('issueForm').addEventListener('submit', issueBook);
+  document.getElementById('issueForm').addEventListener('submit', dispenseMedicine);
   refreshAll();
 }
 

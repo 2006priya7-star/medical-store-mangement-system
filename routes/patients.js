@@ -55,12 +55,12 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-// Deletes a member who has no active book issues.
+// Deletes a member who has no active medicine dispensing records.
 router.delete('/:id', async (req, res, next) => {
   try {
     await ready;
     const active = await db.execute({ sql: 'SELECT id FROM issues WHERE member_id = ? AND return_date IS NULL', args: [req.params.id] });
-    if (active.rows[0]) return res.status(400).json({ error: 'Return this member\'s book before deleting them.' });
+    if (active.rows[0]) return res.status(400).json({ error: 'Return this patient\'s medicine before deleting them.' });
     const previous = await db.execute({ sql: 'SELECT id FROM issues WHERE member_id = ?', args: [req.params.id] });
     if (previous.rows[0]) return res.status(400).json({ error: 'Members with issue history cannot be deleted.' });
     const result = await db.execute({ sql: 'DELETE FROM members WHERE id = ?', args: [req.params.id] });

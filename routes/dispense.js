@@ -7,28 +7,28 @@ function formatDate(date) {
   return date.toISOString().split('T')[0];
 }
 
-// Gets all active issues with the book and member names.
+// Gets all active dispensing records with the medicine and patient names.
 router.get('/', async (req, res, next) => {
   try {
     await ready;
-    const result = await db.execute(`SELECT issues.*, books.title AS book_title, members.name AS member_name
-      FROM issues JOIN books ON issues.book_id = books.id JOIN members ON issues.member_id = members.id
+    const result = await db.execute(`SELECT issues.*, medicines.name AS medicine_name, members.name AS member_name
+      FROM issues JOIN medicines ON issues.medicine_id = medicines.id JOIN members ON issues.member_id = members.id
       WHERE issues.return_date IS NULL ORDER BY issues.due_date`);
     const today = formatDate(new Date());
     res.json(result.rows.map((issue) => ({ ...issue, status: issue.due_date < today ? 'Overdue' : 'On Time' })));
   } catch (error) { next(error); }
 });
 
-// Issues an available book to a selected member for 14 days.
+// Dispenses an available medicine to a selected patient for 14 days.
 router.post('/', async (req, res, next) => {
   try {
     await ready;
-    const bookResult = await db.execute({ sql: 'SELECT * FROM books WHERE id = ?', args: [req.body.book_id] });
+    const medicineResult = await db.execute({ sql: 'SELECT * FROM medicines WHERE id = ?', args: [req.body.medicine_id] });
     const memberResult = await db.execute({ sql: 'SELECT * FROM members WHERE id = ?', args: [req.body.member_id] });
-    const book = bookResult.rows[0];
+    const medicine = medicineResult.rows[0];
     const member = memberResult.rows[0];
-    if (!book || !member) return res.status(400).json({ error: 'Please select a valid book and member.' });
-    if (book.available_copies <= 0) return res.status(400).json({ error: 'This book is currently unavailable.' });
+    if (!medicine || !member) return res.status(400).json({ error: 'Please select a valid medicine and patient.' });
+    if (medicine.available_units <= 0) return res.status(400).json({ error: 'This medicine is currently unavailable.' });
 
     const issueDate = new Date();
     const dueDate = new Date(issueDate);
@@ -36,20 +36,20 @@ router.post('/', async (req, res, next) => {
 
     const [insertResult] = await db.batch([
       {
-        sql: 'INSERT INTO issues (book_id, member_id, issue_date, due_date) VALUES (?, ?, ?, ?)',
-        args: [book.id, member.id, formatDate(issueDate), formatDate(dueDate)]
+        sql: 'INSERT INTO issues (medicine_id, member_id, issue_date, due_date) VALUES (?, ?, ?, ?)',
+        args: [medicine.id, member.id, formatDate(issueDate), formatDate(dueDate)]
       },
       {
-        sql: 'UPDATE books SET available_copies = available_copies - 1 WHERE id = ?',
-        args: [book.id]
+        sql: 'UPDATE medicines SET available_units = available_units - 1 WHERE id = ?',
+        args: [medicine.id]
       }
     ], 'write');
 
-    res.status(201).json({ id: Number(insertResult.lastInsertRowid), message: 'Book issued successfully.' });
+    res.status(201).json({ id: Number(insertResult.lastInsertRowid), message: 'Medicine dispensed successfully.' });
   } catch (error) { next(error); }
 });
 
-// Returns an issued book, restores a copy, and calculates any late fine.
+// Returns a dispensed medicine, restores one unit, and calculates any late fine.
 router.post('/:id/return', async (req, res, next) => {
   try {
     await ready;
@@ -68,12 +68,12 @@ router.post('/:id/return', async (req, res, next) => {
         args: [formatDate(returnDate), fine, issue.id]
       },
       {
-        sql: 'UPDATE books SET available_copies = available_copies + 1 WHERE id = ?',
-        args: [issue.book_id]
+        sql: 'UPDATE medicines SET available_units = available_units + 1 WHERE id = ?',
+        args: [issue.medicine_id]
       }
     ], 'write');
 
-    res.json({ message: 'Book returned successfully.', fine, late_days: lateDays });
+    res.json({ message: 'Medicine returned successfully.', fine, late_days: lateDays });
   } catch (error) { next(error); }
 });
 
